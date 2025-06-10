@@ -65,3 +65,34 @@ export async function POST(req){
     }
 }
 
+
+export async function DELETE(req) {
+    await connectDB();
+
+    try{
+        //saves the search params from the request
+        const {searchParams} = new URL(req.url);
+        //then gets the userId and movieId from the search params
+        const userId = searchParams.get('userId');
+        const movieId = searchParams.get('movieId');
+        //if userId or movieId is not provided, return an error response
+        if (!userId || !movieId) {
+            return NextResponse.json({ message: "userId and movieId are required" }, { status: 400 });
+        }
+        //delete the watchlist item for the userId and movieId
+        const deletedItem = await WatchListItem.findOneAndDelete({ userId: userId, movieId: movieId });
+        //if the item is not found, return an error response
+        if (!deletedItem) {
+            return NextResponse.json({ message: "Watchlist item not found" }, { status: 404 });
+        }
+        console.log("Watchlist item deleted successfully for userId:", userId, "and movieId:", movieId);
+        return NextResponse.json({ message: "Watchlist item deleted successfully" }, { status: 200 });
+
+
+
+    }catch(e) {
+        //this will catch any errors that occur during the connection to the database or deleting the watchlist item
+        console.error("Error connecting to the database or deleting watchlist item:", e);
+        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    }
+}

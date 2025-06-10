@@ -13,4 +13,4 @@ const WatchListItemSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.models.WatchlistItem || mongoose.model('WatchlistItem', WatchlistItemSchema);
+export default mongoose.models.WatchlistItem || mongoose.model('WatchlistItem', WatchListItemSchema);

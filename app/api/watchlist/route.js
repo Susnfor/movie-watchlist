@@ -30,3 +30,38 @@ export async function GET(req) {
     }
 }
 
+
+//create a watchlist item for a user
+export async function POST(req){
+    await connectDB();
+
+    try{
+        //get the data from the request body
+        const {userId, movieId, title, posterPath, year} = await req.json();
+
+        //if any of the required fields are missing, return an error response
+        if (!userId || !movieId || !title) {
+            return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+        }
+
+        //create a new watchlist item
+        const newItem = new WatchListItem({
+            userId,
+            movieId,
+            title,
+            posterPath,
+            year
+        });
+        //save the new item to the database
+        await newItem.save();
+        console.log("Watchlist item created successfully for userId:", userId);
+        return NextResponse.json(newItem, { status: 201 });
+
+
+    }catch(e){
+        //this will catch any errors that occur during the connection to the database or creating the watchlist item
+        console.error("Error connecting to the database or creating watchlist item:", e);
+        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    }
+}
+

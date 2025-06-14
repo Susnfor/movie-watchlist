@@ -6,6 +6,7 @@ import { searchMovies, addMovieToWatchlist } from "../lib/apis"
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import  CircularProgress  from '@mui/material/CircularProgress';
+import { useSnackbar } from 'notistack'; 
 
 
 
@@ -16,11 +17,20 @@ export const SearchBox = () => {
 
     const [results, setResults] = useState([]);
     const [error, setError] = useState(null);
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
     const handleSearch = async (searchTerms) => {
         setIsLoading(true); // Set loading state to true
         setError(null); // Reset error state
         setResults([]); // Clear previous results
+
+    const action = snackbarId => (
+  <>
+    <button onClick={() => { closeSnackbar(snackbarId) }}>
+      Dismiss
+    </button>
+  </>
+);
 
         try {
           const data = await searchMovies(searchTerms);
@@ -33,10 +43,11 @@ export const SearchBox = () => {
                 setResults(data.Search);
             } else {
                 // Handle cases where the API call was successful but found no movies
-                setError(data.Error || 'No movies found with the specified criteria.');
+                setError(data.Error);
             }
         } catch (err) {
             setError(err.message || 'An error occurred while searching');
+            enqueueSnackbar('No movies found with the specified criteria', {action, variant: 'warning' });
         } finally {
             setIsLoading(false);
         }
@@ -55,9 +66,24 @@ export const SearchBox = () => {
 
     try {
       await addMovieToWatchlist(movieData);
-      alert(`${movie.Title} added to your watchlist!`);
+      // Show a success message using the Snackbar
+      enqueueSnackbar(`${movie.Title} added to your watchlist!`, {
+        variant: 'success',
+        action: (snackbarId) => (
+          <button onClick={() => closeSnackbar(snackbarId)}>
+            Dismiss
+          </button>
+        ),
+      });
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      enqueueSnackbar(`Failed to add ${movie.Title} to watchlist`, {
+        variant: 'error',
+        action: (snackbarId) => (
+          <button onClick={() => closeSnackbar(snackbarId)}>
+            Dismiss
+          </button>
+        ),
+      });
     }
   };
 
@@ -71,7 +97,6 @@ export const SearchBox = () => {
 
       {/* 2. Render the Results Area */}
       <Box sx={{ width: '100%', mt: 4 }}>
-        {error && <Typography color="error" align="center" sx={{ mb: 2 }}>{error}</Typography>}
         
         {/* Render the MoviesGrid */}
         {isLoading ?  (

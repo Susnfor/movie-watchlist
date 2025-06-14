@@ -6,7 +6,7 @@ const WatchListItemSchema = new mongoose.Schema(
     movieId: String,
     title: String,
     posterPath: String,
-    year:Number
+    year:String,
   },
   {
     timestamps: true,

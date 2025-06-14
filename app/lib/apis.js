@@ -8,23 +8,33 @@ const API_BASE_URL = '/api'; // Using a relative path
 
 export const searchMovies = async (searchTerms) => {
     const {title, imdbId, year, type} = searchTerms
-    try {
-        // Construct the URL with search parameters
-        const url = new URL(`${API_BASE_URL}/search`);
-        if (imdbId) {
-            url.searchParams.set('i', imdbId);
-        } else if (title) {
-            url.searchParams.set('s', title);
-            // Optional parameters
-            if (year) {
-                url.searchParams.set('y', year);
+        try {
+            // URLSearchParams is used to construct a query string for the API request
+            // It allows to easily append parameters to the URL
+            const params = new URLSearchParams();
+
+            if (imdbId) {
+                params.set('i', imdbId);
+            } else if (title) {
+                params.set('s', title);
+                // Optional parameters
+                if (year) {
+                    params.set('y', year);
+                }
+                if (type) {
+                    params.set('type', type);
+                }
+            } else {
+                throw new Error("Title or IMDb ID is required");
             }
-            if (type) {
-                url.searchParams.set('type', type);
-            }
-        } else {
-            throw new Error("Title or IMDb ID is required");
-        }
+
+        // Construct the final URL string. fetch() can handle this relative path.
+        const url = `${API_BASE_URL}/search?${params.toString()}`;
+        // const url = '/api/search?s=Matrix&y=1999'
+         // DEBUG: Log the URL to the browser console
+        console.log("Attempting to fetch:", url);
+
+
         // Fetch data from the OMDB API
         const response = await fetch(url);
         // Check if the response is successful
@@ -32,9 +42,15 @@ export const searchMovies = async (searchTerms) => {
         // Note for me: response.ok is true only for successful status codes (200-299).
         if (!response.ok) {
             const errorData = await response.json();
+            console.log('failed with ', url)
             throw new Error(errorData.message || 'Failed to fetch movies');
+
             }
         
+        if(response.ok){
+            console.log('success with ', url)
+            console.log (response.json())
+        }
         return response.json();
         }
     catch (error) {

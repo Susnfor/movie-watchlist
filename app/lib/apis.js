@@ -36,23 +36,16 @@ export const searchMovies = async (searchTerms) => {
 
 
         // Fetch data from the OMDB API
-        const response = await fetch(url);
-        // Check if the response is successful
-        // If the response is not ok, throw an error with the message from the API
-        // Note for me: response.ok is true only for successful status codes (200-299).
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.log('failed with ', url)
-            throw new Error(errorData.message || 'Failed to fetch movies');
-
-            }
+         const response = await fetch(url);
         
-        if(response.ok){
-            console.log('success with ', url)
-            console.log (response.json())
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || data.Error || 'Failed to fetch movies');
         }
-        return response.json();
-        }
+        console.log("Data fetched successfully:", data);
+        return data;
+    }
     catch (error) {
         //when the fetch() request fails to reach the server
             console.error("Error fetching data in searchMovies", error);

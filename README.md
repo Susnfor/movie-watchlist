@@ -1,6 +1,7 @@
 # 🎬 Movie Watchlist Tracker
 
 A full-stack web application built with Next.js that allows users to search for movies using the OMDB API, add them to a personal watchlist, and manage their selections. This project demonstrates a complete workflow from frontend user interaction to backend API routes and database management.
+Live Demo: [Here](https://movie-watchlist-blond.vercel.app/)
 
 ---
 
